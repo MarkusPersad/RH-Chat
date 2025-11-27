@@ -7,10 +7,14 @@ import { useRouter } from 'vue-router';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { platform } from '@tauri-apps/plugin-os';
 import { LocalStore } from '../util';
+import { useDebounceFn } from '@vueuse/core';
+import { useUserInfo } from '../storage';
 
+const { setUserInfo } = useUserInfo();
 // 响应式状态，用于切换登录/注册模式
 const isLogin = ref(true)
 const router = useRouter();
+
 
 // 表单数据
 const form = reactive({
@@ -115,7 +119,8 @@ const toggleMode = () => {
 }
 
 // 提交表单
-const handleSubmit = async () => {
+// 创建防抖提交函数
+const debouncedSubmit = useDebounceFn(async () => {
   if (isLogin.value) {
     try{
       let response = await Http.HttpInstance().request({
@@ -132,7 +137,11 @@ const handleSubmit = async () => {
     }
     Http.HttpInstance().setHeader('Authorization',data.data.token);
     await LocalStore.setValue(data.data.userName,data.data);
-    router.push('/home');
+    setUserInfo({
+      userName:data.data.userName,
+      uuid:data.data.uuid
+    });
+    await router.push('/home');
     } catch(error:any) {
       Notification.sendNotification({
         icon:Notification.ERROR,
@@ -166,8 +175,7 @@ const handleSubmit = async () => {
       })
     }
   }
-}
-
+}, 1000, {maxWait: 5000});
 // 最小化窗口
 const minimizeWindow = async () => {
   await getCurrentWindow().minimize();
@@ -279,7 +287,7 @@ const closeWindow = async () => {
         <div class="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-purple-500/0 via-purple-500 to-purple-500/0"></div>
         
         <!-- 表单 -->
-        <form @submit.prevent="handleSubmit">
+        <form @submit.prevent="debouncedSubmit">
           <!-- 用户名（仅注册时显示） -->
           <div v-if="!isLogin" class="mb-5 cyber-input-group">
             <label class="block text-cyan-300 text-xs uppercase tracking-widest mb-2">用户名</label>

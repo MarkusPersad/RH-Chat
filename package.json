@@ -18,6 +18,7 @@
     "@tauri-apps/plugin-os": "~2.3.2",
     "@tauri-apps/plugin-process": "~2.3.1",
     "@tauri-apps/plugin-store": "~2.4.1",
+    "@vueuse/core": "^14.1.0",
     "pinia": "^3.0.4",
     "tailwindcss": "^4.1.17",
     "vue": "^3.5.25",

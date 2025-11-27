@@ -1,14 +1,36 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, Ref, ref } from 'vue';
 import { createTray } from '../util';
 import layout from '../layout/layout.vue';
+import { MenuItem } from '../layout';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
+const menuItems : Ref<Array<MenuItem>> = ref([
+  {
+    icon: 'icon-chat',
+    tooltip:'消息',
+    label:'消息',
+    action:async ()=>{
+      await router.push('/home');
+    }
+  },
+  {
+    icon: 'icon-lianxiren',
+    tooltip:'联系人',
+    label:'联系人',
+    action:async ()=>{
+      await router.push('/home/people');
+    }
+  }
+])
 
 onMounted(async ()=>{
   await createTray();
 })
 </script>
 <template>
-  <layout>
+  <layout :menu-items="menuItems">
     <template #content>
       <RouterView />
     </template>

@@ -1,0 +1,30 @@
+{
+  "id": "5075641",
+  "name": "RH-Chat",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "9148801",
+      "name": "联系人",
+      "font_class": "lianxiren",
+      "unicode": "e611",
+      "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "10199604",
+      "name": "map",
+      "font_class": "map",
+      "unicode": "e719",
+      "unicode_decimal": 59161
+    },
+    {
+      "icon_id": "16618014",
+      "name": "chat",
+      "font_class": "chat",
+      "unicode": "e69d",
+      "unicode_decimal": 59037
+    }
+  ]
+}

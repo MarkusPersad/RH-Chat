@@ -10,7 +10,16 @@ const router = createRouter({
         {
             path:"/home",
             component:()=>import("../page/home.vue"),
-            children:[]
+            children:[
+                {
+                    path:"",
+                    component:()=>import("../page/home/chat.vue")
+                },
+                {
+                    path:"people",
+                    component:() => import("../page/home/People.vue")
+                }
+            ]
         }
     ]
 })

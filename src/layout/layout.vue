@@ -2,19 +2,15 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { Notification } from '../util';
+import { MenuItem } from '.';
 
 // 动态背景粒子
 const particles = ref<Array<{x: number, y: number, size: number, speedX: number, speedY: number}>>([]);
 const gridPoints = ref<Array<{x: number, y: number, size: number, opacity: number}>>([]);
 
- const props = defineProps<{
-  menuItems?: [{
-    icon:Comment,
-    action:Function,
-    tooltip:string
-    label:string
-  }]
- }>();
+const props = defineProps<{
+  menuItems?:Array<MenuItem>,
+  }>();
 
 // 全屏状态
 const isFullscreen = ref(false);
@@ -212,7 +208,7 @@ onBeforeUnmount(() => {
     <input id="drawer-switch" class=" drawer-toggle" type="checkbox" />
     <div class="drawer-content">
       <!-- Navbar -->
-      <nav data-tauri-drag-region class="navbar w-full bg-gray-900/30 backdrop-blur-sm flex items-center justify-between px-4 z-10" style="height: 50px;">
+      <div data-tauri-drag-region class="navbar w-full bg-gray-900/30 backdrop-blur-sm flex items-center justify-between px-4 z-10" style="height: 50px;">
         <div class="flex items-center">
           <label for="drawer-switch" aria-label="打开侧边栏" class="btn btn-square btn-ghost btn-sm text-cyan-300 hover:bg-cyan-500/20 w-8 h-8 min-h-8 mr-2">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" fill="none" stroke="currentColor" class="inline-block w-4 h-4"><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path><path d="M9 4v16"></path><path d="M14 10l2 2l-2 2"></path></svg>
@@ -256,7 +252,7 @@ onBeforeUnmount(() => {
             </svg>
           </button>
         </div>
-      </nav>
+      </div>
 
       <div class="p-4 page-content pt-14">
         <slot name="content"/>
@@ -291,8 +287,12 @@ onBeforeUnmount(() => {
           </template>
           <template v-else>
             <li v-for="menuItem in menuItems" :key="menuItem.label">
-              <button class=" is-drawer-close:tooltip is-drawer-close:tooltip-right cyber-menu-item" :data-tip="menuItem.tooltip">
-                <component :is="menuItem.icon" class="my-1.5 inline-block size-5 group-hover:stroke-cyan-400 group-hover:scale-110 transition-transform duration-200"></component>
+              <button class=" is-drawer-close:tooltip is-drawer-close:tooltip-right cyber-menu-item" :data-tip="menuItem.tooltip" @click="menuItem.action">
+                <div :class="[
+                  'iconfont',
+                  'my-1.5 inline-block size-5 group-hover:stroke-cyan-400 group-hover:scale-110 transition-transform duration-200',
+                  menuItem.icon
+                  ]"></div>
                 <span class="is-drawer-close:hidden">{{ menuItem.label }}</span>
               </button>
             </li>
