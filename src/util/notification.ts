@@ -1,5 +1,7 @@
 import { isPermissionGranted, requestPermission, sendNotification } from "@tauri-apps/plugin-notification"
 import { platform } from "@tauri-apps/plugin-os";
+import { invoke } from '@tauri-apps/api/core';
+import { Command } from '@tauri-apps/plugin-shell';
 
 export class Notification{
     private static readonly CURRENT_PLATFORM : string = platform() ;
@@ -17,17 +19,29 @@ export class Notification{
         icon: typeof Notification.SUCCESS | typeof Notification.WARNING | typeof Notification.ERROR | typeof Notification.INFO,
         body: any,
     }){
-        let permissionGranted = await isPermissionGranted();
-        if(!permissionGranted){
-            const permission = await requestPermission();
-            permissionGranted = permission === "granted";
-        }
-        if(permissionGranted){
-            sendNotification({
-                title: "RH-Chat",
-                icon: content.icon,
-                body:content.body,
-            })
+        const desktopEnv: string = await invoke('get_desktop_environment');
+        if(desktopEnv === 'gnome'){
+            await Command.create('notify-send', [
+                '-u',
+                'critical',
+                '-i',
+                content.icon,
+                'RH-Chat',
+                content.body
+            ]).execute();
+        }else {
+            let permissionGranted = await isPermissionGranted();
+            if(!permissionGranted){
+                const permission = await requestPermission();
+                permissionGranted = permission === "granted";
+            }
+            if(permissionGranted){
+                sendNotification({
+                    title: "RH-Chat",
+                    icon: content.icon,
+                    body:content.body,
+                })
+            }
         }
     }
 }

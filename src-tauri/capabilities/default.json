@@ -28,6 +28,17 @@
     "core:window:allow-start-dragging",
     "os:default",
     "store:default",
-    "process:default"
+    "process:default",
+    "shell:default",
+    {
+      "identifier":"shell:allow-execute",
+      "allow": [
+        {
+          "name": "notify-send",
+          "cmd": "notify-send",
+          "args":true
+        }
+      ]
+    }
   ]
 }
