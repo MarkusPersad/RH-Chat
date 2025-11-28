@@ -2,39 +2,39 @@ import { fetch } from '@tauri-apps/plugin-http';
 import { API } from '../assets/default.json';
 
 interface ClientConfig {
-      baseURL: string;
-      headers?: Record<string, string>;
-      connectTimeout?: number;
-      maxRedirections?: number;
-      requestInterceptors?: ((config: RequestConfig) => RequestConfig)[];
-      responseInterceptors?: ((response: Response) => Response)[];
+    baseURL: string;
+    headers?: Record<string, string>;
+    connectTimeout?: number;
+    maxRedirections?: number;
+    requestInterceptors?: ((config: RequestConfig) => RequestConfig)[];
+    responseInterceptors?: ((response: Response) => Response)[];
 }
 
 export interface RequestConfig {
-      method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-      url: string;
-      data?: any;
-      headers?: Record<string, string>;
-      outurl?: boolean;
+    method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+    url: string;
+    data?: any;
+    headers?: Record<string, string>;
+    outurl?: boolean;
 }
 
 export class Http{
     private baseURL: string;
-      private headers: Record<string, string>;
-      private connectTimeout: number;
-      private maxRedirections: number;
-      private requestInterceptors: ((config: RequestConfig) => RequestConfig)[];
-      private responseInterceptors: ((response: Response) => Response)[];
-      private static instance: Http;
+    private headers: Record<string, string>;
+    private connectTimeout: number;
+    private maxRedirections: number;
+    private requestInterceptors: ((config: RequestConfig) => RequestConfig)[];
+    private responseInterceptors: ((response: Response) => Response)[];
+    private static instance: Http;
 
-      constructor(config: ClientConfig) {
-      this.baseURL = config.baseURL;
-      this.headers = config.headers || {};
-      this.connectTimeout = config.connectTimeout || 5000;
-      this.maxRedirections = config.maxRedirections || 5;
-      this.requestInterceptors = config.requestInterceptors || [];
-      this.responseInterceptors = config.responseInterceptors || [];
-      this.setHeader('Content-Type', 'application/json');
+    constructor(config: ClientConfig) {
+        this.baseURL = config.baseURL;
+        this.headers = config.headers || {};
+        this.connectTimeout = config.connectTimeout || 5000;
+        this.maxRedirections = config.maxRedirections || 5;
+        this.requestInterceptors = config.requestInterceptors || [];
+        this.responseInterceptors = config.responseInterceptors || [];
+        this.setHeader('Content-Type', 'application/json');
     }
     public static HttpInstance():Http{
         if(Http.instance){

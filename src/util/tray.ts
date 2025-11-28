@@ -28,11 +28,11 @@ export const createTray = async () => {
         menu:await Menu.new({
             items:[
                 {
-                   id:"showMainWindow",
-                   text:"显示主窗口",
-                   action:async () =>{
+                    id:"showMainWindow",
+                    text:"显示主窗口",
+                    action:async () =>{
                         await showMainWindow();
-                   } 
+                    } 
                 },
                 {
                     id:"Restart",
