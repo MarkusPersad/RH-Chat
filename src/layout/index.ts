@@ -4,4 +4,5 @@ export interface MenuItem {
     action:(event:PointerEvent) => void,
     tooltip:string
     label:string
+    route:string
 }

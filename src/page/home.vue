@@ -11,6 +11,7 @@ const menuItems : Ref<Array<MenuItem>> = ref([
     icon: 'icon-chat',
     tooltip:'消息',
     label:'消息',
+    route:"/home",
     action:async ()=>{
       await router.push('/home');
     }
@@ -19,6 +20,7 @@ const menuItems : Ref<Array<MenuItem>> = ref([
     icon: 'icon-lianxiren',
     tooltip:'联系人',
     label:'联系人',
+    route:"/home/people",
     action:async ()=>{
       await router.push('/home/people');
     }

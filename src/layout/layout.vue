@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue';
 import { getCurrentWindow } from '@tauri-apps/api/window';
 import { Notification } from '../util';
 import { MenuItem } from '.';
+import { useRoute } from 'vue-router';
 
 // 动态背景粒子
 const particles = ref<Array<{x: number, y: number, size: number, speedX: number, speedY: number}>>([]);
@@ -11,6 +12,30 @@ const gridPoints = ref<Array<{x: number, y: number, size: number, opacity: numbe
 const props = defineProps<{
   menuItems?:Array<MenuItem>,
   }>();
+
+// 获取当前路由
+const route = useRoute();
+
+// 计算当前激活的菜单项
+const activeRoute = computed(() => {
+  if (!props.menuItems) return '';
+  
+  // 查找完全匹配的路由
+  for (const item of props.menuItems) {
+    if (route.path === item.route) {
+      return item.route;
+    }
+  }
+  
+  // 如果没有完全匹配，查找前缀匹配（适用于子路由）
+  for (const item of props.menuItems) {
+    if (route.path.startsWith(item.route)) {
+      return item.route;
+    }
+  }
+  
+  return '';
+});
 
 // 全屏状态
 const isFullscreen = ref(false);
@@ -225,7 +250,7 @@ onBeforeUnmount(() => {
           >
             <!-- 非全屏状态图标（进入全屏） -->
             <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-4 h-4 stroke-current">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9M20.25 20.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L20.25 3.75M20.25 20.25h-4.5m4.5 0v-4.5m0 4.5L20.25 20.25" />
             </svg>
 
             <!-- 全屏状态图标（退出全屏） -->
@@ -286,14 +311,25 @@ onBeforeUnmount(() => {
             </li>
           </template>
           <template v-else>
-            <li v-for="menuItem in menuItems" :key="menuItem.label">
-              <button class=" is-drawer-close:tooltip is-drawer-close:tooltip-right cyber-menu-item" :data-tip="menuItem.tooltip" @click="menuItem.action">
+            <li v-for="menuItem in menuItems" :key="menuItem.route">
+              <button 
+                class="is-drawer-close:tooltip is-drawer-close:tooltip-right cyber-menu-item" 
+                :data-tip="menuItem.tooltip" 
+                @click="menuItem.action"
+                :class="{ 'bg-cyan-500/30 border-r-2 border-cyan-400': activeRoute === menuItem.route }"
+              >
                 <div :class="[
                   'iconfont',
                   'my-1.5 inline-block size-5 group-hover:stroke-cyan-400 group-hover:scale-110 transition-transform duration-200',
-                  menuItem.icon
-                  ]"></div>
-                <span class="is-drawer-close:hidden">{{ menuItem.label }}</span>
+                  menuItem.icon,
+                  activeRoute === menuItem.route ? 'text-cyan-400 font-bold' : ''
+                ]"></div>
+                <span 
+                  class="is-drawer-close:hidden" 
+                  :class="{ 'text-cyan-400 font-bold': activeRoute === menuItem.route }"
+                >
+                  {{ menuItem.label }}
+                </span>
               </button>
             </li>
           </template>
