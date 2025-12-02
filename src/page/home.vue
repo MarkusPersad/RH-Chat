@@ -17,6 +17,17 @@ const menuItems : Ref<Array<MenuItem>> = ref([
     }
   },
   {
+    icon: 'icon-shezhi',
+    tooltip:'设置',
+    label:'设置',
+    route:"/home/setting",
+    action:async ()=>{
+      // await router.push('/home/setting');
+      console.log('设置');
+    },
+    end:true
+  },
+  {
     icon: 'icon-lianxiren',
     tooltip:'联系人',
     label:'联系人',

@@ -5,4 +5,5 @@ export interface MenuItem {
     tooltip:string
     label:string
     route:string
+    end?:boolean
 }

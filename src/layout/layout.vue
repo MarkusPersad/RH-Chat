@@ -163,6 +163,15 @@ onMounted(async () => {
   }
 });
 
+const sortedItems = computed(()=>{
+  if (!props.menuItems) return [];
+
+   const normalItems = props.menuItems.filter(item => !item.end);
+  const endItems = props.menuItems.filter(item => item.end);
+  
+  return [...normalItems, ...endItems];
+})
+
 // 组件卸载前
 onBeforeUnmount(() => {
   cancelAnimationFrame(animationFrameId);
@@ -311,7 +320,7 @@ onBeforeUnmount(() => {
             </li>
           </template>
           <template v-else>
-            <li v-for="menuItem in menuItems" :key="menuItem.route">
+            <li v-for="menuItem in sortedItems" :key="menuItem.route" :class="{'mt-auto': menuItem.end}">
               <button 
                 class="is-drawer-close:tooltip is-drawer-close:tooltip-right cyber-menu-item" 
                 :data-tip="menuItem.tooltip" 
