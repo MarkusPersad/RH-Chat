@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "1831600",
+      "name": "客户群组",
+      "font_class": "kehuqunzu",
+      "unicode": "e648",
+      "unicode_decimal": 58952
+    },
+    {
+      "icon_id": "5876958",
+      "name": "好友",
+      "font_class": "biaoqing",
+      "unicode": "e60f",
+      "unicode_decimal": 58895
+    },
+    {
       "icon_id": "162882",
       "name": "设置",
       "font_class": "shezhi",
