@@ -1,4 +1,4 @@
-
+``
 export interface MenuItem {
     icon:string,
     action:(event:PointerEvent) => void,
