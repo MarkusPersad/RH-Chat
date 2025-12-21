@@ -9,6 +9,7 @@ import { platform } from '@tauri-apps/plugin-os';
 import { LocalStore } from '../util';
 import { useDebounceFn } from '@vueuse/core';
 import { useUserInfo } from '../storage';
+import CyberForm from '../components/CyberForm.vue';
 
 const { setUserInfo } = useUserInfo();
 // 响应式状态，用于切换登录/注册模式
@@ -120,7 +121,10 @@ const toggleMode = () => {
 
 // 提交表单
 // 创建防抖提交函数
-const debouncedSubmit = useDebounceFn(async () => {
+const debouncedSubmit = useDebounceFn(async (formData) => {
+  // 将表单数据映射到原始表单对象
+  Object.assign(form, formData);
+
   if (isLogin.value) {
     try{
       let response = await Http.HttpInstance().request({
@@ -221,7 +225,7 @@ const closeWindow = async () => {
       <div 
         v-for="(point, index) in gridPoints" 
         :key="'grid-'+index"
-        class="absolute rounded-full bg-cyan-400"
+        class="cyber-grid-point"
         :style="{
           left: point.x + 'px',
           top: point.y + 'px',
@@ -250,14 +254,13 @@ const closeWindow = async () => {
     <div 
       v-for="(particle, index) in particles" 
       :key="'particle-'+index"
-      class="absolute rounded-full bg-cyan-400"
+      class="cyber-particle"
       :style="{
         left: particle.x + 'px',
         top: particle.y + 'px',
         width: particle.size + 'px',
         height: particle.size + 'px',
-        opacity: 0.7,
-        boxShadow: '0 0 ' + particle.size * 3 + 'px rgba(0, 229, 255, 0.8)'
+        '--particle-size': particle.size
       }"
     ></div>
     
@@ -287,77 +290,37 @@ const closeWindow = async () => {
         <div class="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-purple-500/0 via-purple-500 to-purple-500/0"></div>
         
         <!-- 表单 -->
-        <form @submit.prevent="debouncedSubmit">
-          <!-- 用户名（仅注册时显示） -->
-          <div v-if="!isLogin" class="mb-5 cyber-input-group">
-            <label class="block text-cyan-300 text-xs uppercase tracking-widest mb-2">用户名</label>
-            <div class="relative">
-              <input
-                v-model="form.username"
-                type="text"
-                class="w-full bg-gray-900/50 border border-cyan-500/30 text-white py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder-gray-600 cyber-input"
-                placeholder="请输入用户名"
-                required
-              />
-              <div class="input-corner input-corner-tl"></div>
-              <div class="input-corner input-corner-tr"></div>
-              <div class="input-corner input-corner-bl"></div>
-              <div class="input-corner input-corner-br"></div>
-            </div>
-          </div>
+        <CyberForm 
+          :fields="isLogin ? [
+            { name: 'email', label: '邮箱', type: 'email', placeholder: '请输入邮箱', required: true },
+            { name: 'password', label: '密码', type: 'password', placeholder: '请输入密码', required: true }
+          ] : [
+            { name: 'username', label: '用户名', type: 'text', placeholder: '请输入用户名', required: true },
+            { name: 'email', label: '邮箱', type: 'email', placeholder: '请输入邮箱', required: true },
+            { name: 'password', label: '密码', type: 'password', placeholder: '请输入密码', required: true }
+          ]"
+          :submit-text="isLogin ? '进入系统' : '创建账户'"
+          :is-login="isLogin"
+          :toggle-text="isLogin ? '立即注册' : '在此登录'"
+          @submit="debouncedSubmit"
+          @toggle="toggleMode"
+        >
+          <template #footer="{ toggle }">
+            <p v-if="isLogin">
+              新用户？
+              <button @click="toggle" class="text-cyan-400 hover:text-cyan-300 underline cyber-link">
+                立即注册
+              </button>
+            </p>
+            <p v-else>
+              已有账户？
+              <button @click="toggle" class="text-cyan-400 hover:text-cyan-300 underline cyber-link">
+                在此登录
+              </button>
+            </p>
+          </template>
+        </CyberForm>
 
-          <!-- 邮箱 -->
-          <div class="mb-5 cyber-input-group">
-            <label class="block text-cyan-300 text-xs uppercase tracking-widest mb-2">邮箱</label>
-            <div class="relative">
-              <input
-                v-model="form.email"
-                type="email"
-                class="w-full bg-gray-900/50 border border-cyan-500/30 text-white py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder-gray-600 cyber-input"
-                placeholder="请输入邮箱"
-                required
-              />
-              <div class="input-corner input-corner-tl"></div>
-              <div class="input-corner input-corner-tr"></div>
-              <div class="input-corner input-corner-bl"></div>
-              <div class="input-corner input-corner-br"></div>
-            </div>
-          </div>
-
-          <!-- 密码 -->
-          <div class="mb-6 cyber-input-group">
-            <label class="block text-cyan-300 text-xs uppercase tracking-widest mb-2">密码</label>
-            <div class="relative">
-              <input
-                v-model="form.password"
-                type="password"
-                class="w-full bg-gray-900/50 border border-cyan-500/30 text-white py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent transition-all placeholder-gray-600 cyber-input"
-                placeholder="请输入密码"
-                required
-              />
-              <div class="input-corner input-corner-tl"></div>
-              <div class="input-corner input-corner-tr"></div>
-              <div class="input-corner input-corner-bl"></div>
-              <div class="input-corner input-corner-br"></div>
-            </div>
-          </div>
-
-          <!-- 提交按钮 -->
-          <button
-            type="submit"
-            class="w-full bg-linear-to-r from-cyan-600 to-purple-700 hover:from-cyan-500 hover:to-purple-600 text-white py-3 px-4 rounded-lg font-medium transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50 shadow-lg shadow-cyan-500/20 cyber-button relative"
-          >
-            <span class="relative z-10">{{ isLogin ? '进入系统' : '创建账户' }}</span>
-            <div class="button-edge button-edge-top"></div>
-            <div class="button-edge button-edge-bottom"></div>
-          </button>
-        </form>
-
-        <!-- 底部信息 -->
-        <div class="mt-6 text-center text-xs text-gray-400 tracking-widest cyber-panel ">
-          <p v-if="isLogin">新用户？<button @click="toggleMode" class="text-cyan-400 hover:text-cyan-300 underline cyber-link">立即注册</button></p>
-          <p v-else>已有账户？<button @click="toggleMode" class="text-cyan-400 hover:text-cyan-300 underline cyber-link">在此登录</button></p>
-        </div>
       </div>
 
       <!-- 装饰性元素 -->
@@ -582,97 +545,40 @@ const closeWindow = async () => {
   z-index: -1;
 }
 
-.cyber-input {
-  position: relative;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-
-.cyber-input:focus {
-  box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
-  border-color: rgba(0, 229, 255, 0.7);
-}
-
-.input-corner {
+.cyber-grid-point {
+  border-radius: 9999px;
+  background-color: rgb(34 211 238); /* cyan-400 */
   position: absolute;
-  width: 8px;
-  height: 8px;
-  border-color: #00e5ff;
 }
 
-.input-corner-tl {
-  top: 0;
-  left: 0;
-  border-top: 2px solid;
-  border-left: 2px solid;
-}
-
-.input-corner-tr {
-  top: 0;
-  right: 0;
-  border-top: 2px solid;
-  border-right: 2px solid;
-}
-
-.input-corner-bl {
-  bottom: 0;
-  left: 0;
-  border-bottom: 2px solid;
-  border-left: 2px solid;
-}
-
-.input-corner-br {
-  bottom: 0;
-  right: 0;
-  border-bottom: 2px solid;
-  border-right: 2px solid;
-}
-
-.cyber-button {
-  overflow: hidden;
-  border-radius: 4px;
-}
-
-.cyber-button:hover {
-  box-shadow: 0 0 20px rgba(0, 229, 255, 0.5);
-}
-
-.button-edge {
+.cyber-particle {
+  border-radius: 9999px;
+  background-color: rgb(34 211 238); /* cyan-400 */
   position: absolute;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(to right, transparent, #00e5ff, transparent);
+  opacity: 0.7;
 }
 
-.button-edge-top {
-  top: 0;
+.cyber-particle[data-particle-size] {
+  box-shadow: 0 0 calc(var(--particle-size, 0px) * 3) rgb(0 229 255 / 0.8);
 }
 
-.button-edge-bottom {
-  bottom: 0;
+/* 慢速脉冲动画 */
+@keyframes ping-slow {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  75%, 100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
-.cyber-link {
-  position: relative;
-  transition: all 0.3s ease;
+.animate-ping-slow {
+  animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
-.cyber-link::after {
-  content: "";
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 0;
-  height: 1px;
-  background: #00e5ff;
-  transition: width 0.3s ease;
-}
-
-.cyber-link:hover::after {
-  width: 100%;
-}
-
+/* 扫描线动画 */
 .scan-line {
   position: absolute;
   top: 0;
@@ -694,19 +600,23 @@ const closeWindow = async () => {
   }
 }
 
-/* 慢速脉冲动画 */
-@keyframes ping-slow {
-  0% {
-    transform: scale(0.8);
-    opacity: 1;
-  }
-  75%, 100% {
-    transform: scale(1.5);
-    opacity: 0;
-  }
+.cyber-link {
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-.animate-ping-slow {
-  animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite;
+.cyber-link::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: #00e5ff;
+  transition: width 0.3s ease;
+}
+
+.cyber-link:hover::after {
+  width: 100%;
 }
 </style>
